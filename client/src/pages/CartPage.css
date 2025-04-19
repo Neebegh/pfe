@@ -1,0 +1,22 @@
+.cart-page {
+    padding: 20px;
+  }
+  
+  .cart-items {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .cart-item {
+    display: flex;
+    gap: 16px;
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+  }
+  
+  .cart-item img {
+    width: 100px;
+    height: auto;
+    object-fit: cover;
+  }
+  

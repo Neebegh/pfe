@@ -1,0 +1,144 @@
+/* Styles généraux pour les deux pages */
+.auth-container {
+    max-width: 500px;
+    margin: 4rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .auth-container h2 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: 600;
+  }
+  
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .form-group label {
+    font-weight: 500;
+    color: #2c3e50;
+  }
+  
+  .form-group input {
+    padding: 0.8rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .form-group input:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    outline: none;
+  }
+  
+  .auth-btn {
+    padding: 0.8rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .auth-btn:hover {
+    background-color: #2980b9;
+  }
+  
+  .auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #7f8c8d;
+  }
+  
+  .auth-link {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+  
+  .auth-link:hover {
+    color: #2980b9;
+    text-decoration: underline;
+  }
+  
+  /* Styles spécifiques à Register */
+  .password-strength {
+    margin-top: 0.5rem;
+    height: 4px;
+    background: #eee;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  
+  .strength-bar {
+    height: 100%;
+    width: 0%;
+    background: #e74c3c;
+    transition: all 0.3s ease;
+  }
+  
+  .strength-weak {
+    background: #e74c3c;
+    width: 30%;
+  }
+  
+  .strength-medium {
+    background: #f39c12;
+    width: 60%;
+  }
+  
+  .strength-strong {
+    background: #2ecc71;
+    width: 100%;
+  }
+  
+  .password-hints {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #7f8c8d;
+  }
+  
+  /* Animation de chargement */
+  .auth-loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    margin-left: 10px;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Responsive */
+  @media (max-width: 600px) {
+    .auth-container {
+      margin: 2rem 1rem;
+      padding: 1.5rem;
+    }
+  }
