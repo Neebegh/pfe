@@ -3,10 +3,15 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const path = require('path');
+
+
 
 const app = express();
 
 // Middlewares
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(express.json());
 app.use(cookieParser());

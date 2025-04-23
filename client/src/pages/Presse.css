@@ -1,0 +1,36 @@
+.presse-container {
+    max-width: 800px;
+    margin: auto;
+    padding: 2rem;
+    font-family: 'Arial', sans-serif;
+    background-color: #fefefe;
+    line-height: 1.7;
+  }
+  
+  .presse-title {
+    text-align: center;
+    color: #2c2c2c;
+    margin-bottom: 1rem;
+  }
+  
+  .presse-intro {
+    margin-bottom: 2rem;
+    color: #444;
+  }
+  
+  .presse-mentions,
+  .presse-communiques {
+    margin-left: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .presse-mentions li,
+  .presse-communiques li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .presse-contact {
+    font-weight: bold;
+    color: #333;
+  }
+  

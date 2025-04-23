@@ -1,290 +1,232 @@
-/* === Top promo bar === */
-.top-promo-bar {
-  background-color: #2c3e50;
-  color: white;
-  padding: 0.5rem 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.9rem;
-}
-
-.locale-selector select {
-  background: transparent;
-  border: none;
-  color: white;
-  padding: 0.2rem;
-}
-
-/* === Navbar principale === */
+/* === Base === */
 .navbar {
-  background-color: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+  padding: 1rem 2rem;
   position: sticky;
   top: 0;
   z-index: 1000;
   transition: all 0.3s ease;
-  overflow-x: hidden;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .navbar.scrolled {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .navbar-container {
-  display: grid;
-  grid-template-columns: auto 1fr auto auto;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 1rem;
-  max-width: 1300px;
-  margin: 0 auto;
-  padding: 1rem 1rem;
-  overflow-x: hidden;
+  flex-wrap: wrap;
 }
 
 /* === Logo === */
-.navbar-brand {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.logo-link {
-  text-decoration: none;
-}
-
 .logo-text {
   font-size: 1.8rem;
   font-weight: 700;
-  background: linear-gradient(to right, #3498db, #2c3e50);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #001489;
+  text-decoration: none;
 }
 
-/* === Mobile menu bouton === */
-.mobile-menu-button {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  margin-right: 1rem;
-  display: none;
-  cursor: pointer;
-  color: #2c3e50;
-}
-
-/* === Menu principal === */
-.main-navigation {
-  overflow: hidden;
-}
-
+/* === Navigation === */
 .nav-menu {
   display: flex;
+  gap: 2rem;
   list-style: none;
-  margin: 0;
-  padding: 0;
-  gap: 1.2rem;
-  flex-wrap: wrap;
 }
 
 .nav-item {
   position: relative;
 }
 
-.category-link {
-  display: flex;
-  align-items: center;
-  position: relative;
-}
-
 .category-link > a {
-  text-decoration: none;
-  color: #2c3e50;
   font-weight: 500;
-  padding: 0.5rem 0;
-  transition: color 0.3s;
+  font-size: 1rem;
+  color: #333;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-.category-link:hover > a {
-  color: #3498db;
+.category-link > a:hover {
+  color: #001489;
 }
 
 .dropdown-icon {
-  margin-left: 0.3rem;
-  font-size: 0.8rem;
-  color: #7f8c8d;
-  transition: transform 0.3s;
-}
-
-.category-link:hover .dropdown-icon {
-  transform: rotate(180deg);
-  color: #3498db;
+  margin-left: 4px;
+  font-size: 0.7rem;
+  color: #555;
 }
 
 .dropdown-menu {
   position: absolute;
   top: 100%;
   left: 0;
-  background: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  min-width: 200px;
-  padding: 0.5rem 0;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(10px);
-  transition: all 0.3s ease;
-  z-index: 100;
+  display: none;
+  flex-direction: column;
+  background: #fff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  min-width: 160px;
+  z-index: 999;
 }
 
-.category-link:hover .dropdown-menu {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
+.nav-item:hover .dropdown-menu {
+  display: flex;
 }
 
 .dropdown-item {
-  display: block;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0;
+  color: #555;
+  font-size: 0.95rem;
   text-decoration: none;
-  color: #34495e;
-  transition: all 0.2s;
+  transition: color 0.2s ease;
 }
 
 .dropdown-item:hover {
-  background: #f8f9fa;
-  color: #3498db;
+  color: #001489;
 }
 
-/* === Search bar === */
-.navbar-search {
-  max-width: 420px;
-  width: 100%;
-}
-
-.search-group {
-  display: flex;
-  background-color: #f1f1f1;
-  border-radius: 30px;
-  padding: 0.4rem 1rem;
-  border: 1px solid transparent;
-  transition: all 0.3s ease;
-}
-
-.search-group:focus-within {
-  border-color: #3498db;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-}
-
-.search-input {
-  flex-grow: 1;
-  border: none;
-  background: transparent;
-  padding: 0.5rem;
-  font-size: 1rem;
-  outline: none;
-}
-
-.search-button {
-  background: none;
-  border: none;
-  font-size: 1rem;
-  color: #2c3e50;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.search-button:hover {
-  color: #3498db;
-}
-
-/* === Actions utilisateur === */
+/* === Actions (wishlist, cart, user) === */
 .navbar-actions {
   display: flex;
   align-items: center;
   gap: 1rem;
-  flex-shrink: 0;
 }
 
 .action-icons {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 1.2rem;
 }
 
 .action-icon {
-  font-size: 1.3rem;
-  color: #2c3e50;
-  transition: color 0.2s;
+  font-size: 1.2rem;
+  color: #333;
   position: relative;
+  transition: color 0.2s ease;
 }
 
 .action-icon:hover {
-  color: #3498db;
+  color: #001489;
 }
 
 .cart-badge {
   position: absolute;
-  top: -6px;
+  top: -8px;
   right: -10px;
-  background: #e74c3c;
-  color: white;
+  background: #e60023;
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 2px 6px;
   border-radius: 50%;
-  font-size: 11px;
-  width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-weight: bold;
 }
 
-.service-client-icon {
+/* === Auth & User Dropdown === */
+.user-dropdown {
+  position: relative;
+}
+
+.user-icon {
+  background: none;
+  border: none;
   font-size: 1.3rem;
-  color: #16a085;
+  color: #333;
   cursor: pointer;
 }
 
-/* === Auth Buttons === */
-.auth-buttons {
+.dropdown-menu.user-menu {
+  position: absolute;
+  right: 0;
+  top: 120%;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  padding: 1rem;
+  min-width: 200px;
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
+  flex-direction: column;
+  z-index: 999;
 }
 
-.auth-link {
-  padding: 0.4rem 1rem;
+.user-info {
+  font-size: 0.95rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.logout-btn {
+  border: none;
+  background: none;
+  color: #e60023;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+/* === Auth Buttons (Login/Register) === */
+.auth-buttons .auth-link {
+  margin-left: 1rem;
   text-decoration: none;
   font-weight: 500;
-  font-size: 0.9rem;
-  border-radius: 20px;
-  border: 1px solid #2c3e50;
-  background-color: transparent;
-  color: #2c3e50;
-  transition: all 0.3s ease;
-  white-space: nowrap;
+  color: #001489;
+  transition: color 0.2s ease;
 }
 
-.auth-link:hover {
-  background: #f8f9fa;
-  color: #3498db;
-  border-color: #3498db;
+.auth-buttons .auth-link:hover {
+  color: #0034a3;
 }
 
 .signup-link {
-  background-color: #2c3e50;
-  color: white;
+  font-weight: 700;
+}
+
+/* === Responsive (Mobile) === */
+.mobile-menu-button {
+  display: none;
+  background: none;
   border: none;
+  font-size: 1.6rem;
+  color: #001489;
 }
 
-.signup-link:hover {
-  background-color: #1a252f;
-  color: white;
+.mobile-menu {
+  display: none;
+  width: 100%;
+  background: white;
+  padding: 1rem 2rem;
 }
 
-/* === Responsive === */
-@media (max-width: 1024px) {
-  .main-navigation {
+.mobile-menu.open {
+  display: block;
+}
+
+.mobile-nav-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mobile-nav-menu li {
+  padding: 0.5rem 0;
+}
+
+.mobile-nav-menu a {
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.mobile-nav-menu a:hover {
+  color: #001489;
+}
+
+/* === Breakpoint === */
+@media (max-width: 768px) {
+  .nav-menu {
     display: none;
   }
 
@@ -292,34 +234,9 @@
     display: block;
   }
 
-  .navbar-search {
-    display: none;
-  }
-
-  .mobile-menu .mobile-search {
-    display: block;
-  }
-}
-
-@media (max-width: 768px) {
-  .auth-buttons {
-    display: none;
-  }
-
-  .mobile-menu .auth-buttons {
-    display: flex;
+  .navbar-actions {
     flex-direction: column;
-    margin-top: 1rem;
-  }
-
-  .mobile-menu .auth-link {
-    margin: 0.5rem 0;
-    text-align: center;
-  }
-}
-
-@media (min-width: 1025px) {
-  .mobile-menu {
-    display: none;
+    align-items: flex-end;
+    gap: 0.5rem;
   }
 }

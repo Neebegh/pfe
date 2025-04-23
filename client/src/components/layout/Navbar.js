@@ -1,7 +1,6 @@
-// src/components/layout/Navbar.jsx
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaSearch, FaUser, FaHeart, FaShoppingCart, FaBars, FaTimes, FaChevronDown, FaHeadset } from 'react-icons/fa';
+import { FaUser, FaHeart, FaShoppingCart, FaBars, FaTimes, FaChevronDown, FaHeadset } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import './Navbar.css';
@@ -9,8 +8,8 @@ import './Navbar.css';
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
+  const [wishlistCount, setWishlistCount] = useState(0);
   const { user, logout } = useAuth();
   const { cart } = useCart();
   const navigate = useNavigate();
@@ -28,14 +27,15 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-      setSearchQuery('');
-      setIsMobileMenuOpen(false);
-    }
-  };
+  useEffect(() => {
+    const handleWishlist = () => {
+      const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+      setWishlistCount(wishlist.length);
+    };
+    handleWishlist();
+    window.addEventListener('storage', handleWishlist);
+    return () => window.removeEventListener('storage', handleWishlist);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -44,18 +44,6 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="top-promo-bar">
-        <div className="promo-content">
-          Livraison gratuite à partir de 200 DT | Retours sous 30 jours
-        </div>
-        <div className="locale-selector">
-          <select aria-label="Langue">
-            <option value="fr">FR</option>
-            <option value="en">EN</option>
-          </select>
-        </div>
-      </div>
-
       <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`} aria-label="Navigation principale">
         <div className="navbar-container">
           <div className="navbar-brand">
@@ -96,24 +84,12 @@ const Navbar = () => {
           </div>
 
           <div className="navbar-actions">
-            <div className="navbar-search">
-              <form onSubmit={handleSearch} role="search">
-                <div className="search-group">
-                  <input
-                    type="search"
-                    placeholder="Rechercher des produits..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="search-input"
-                  />
-                  <button type="submit" aria-label="Rechercher" className="search-button"><FaSearch /></button>
-                </div>
-              </form>
-            </div>
-
             <div className="action-icons">
               <Link to="/wishlist" className="action-icon" aria-label="Liste de souhaits">
                 <FaHeart />
+                {wishlistCount > 0 && (
+                  <span className="cart-badge">{wishlistCount}</span>
+                )}
               </Link>
 
               <Link to="/cart" className="action-icon cart-icon" aria-label="Panier">
@@ -152,18 +128,6 @@ const Navbar = () => {
         </div>
 
         <div className={`mobile-menu ${isMobileMenuOpen ? 'open' : ''}`}>
-          <div className="mobile-search">
-            <form onSubmit={handleSearch}>
-              <input
-                type="search"
-                placeholder="Rechercher..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <button type="submit"><FaSearch /></button>
-            </form>
-          </div>
-
           <ul className="mobile-nav-menu">
             {categories.map((category) => (
               <li key={category.path}>

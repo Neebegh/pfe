@@ -1,89 +1,115 @@
-// src/pages/Products.js
-import React, { useEffect, useState } from 'react';
-import './AllProducts.css'; 
-// import { useCart } from '../context/CartContext';
-import LoadingSpinner from '../components/ui/LoadingSpinner'; // ✅ SEULEMENT cette ligne
-import { useNavigate } from 'react-router-dom';
-
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import { FiSearch } from 'react-icons/fi';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
+import './AllProducts.css';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('');
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem('cart');
     return savedCart ? JSON.parse(savedCart) : [];
   });
+  const [sortOption, setSortOption] = useState('default');
 
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    fetch('http://localhost:5000/api/products')
-      .then((res) => res.json())
-      .then((data) => {
-        setProducts(data.products);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Erreur chargement produits :', err);
-        setLoading(false);
-      });
+  const fetchProducts = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:5000/api/products');
+      if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+      const data = await response.json();
+      setProducts(data.products);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
-  }, [cart]);
+    fetchProducts();
+  }, [fetchProducts]);
 
-  const addToCart = (product) => {
-    const existing = cart.find((p) => p.id === product.id);
-    if (!existing) {
-      setCart([...cart, { ...product, quantity: 1 }]);
+  const filteredAndSortedProducts = useMemo(() => {
+    let result = [...products];
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(p =>
+        p.name.toLowerCase().includes(term) ||
+        (p.description && p.description.toLowerCase().includes(term))
+      );
     }
+    switch (sortOption) {
+      case 'price-asc': return result.sort((a, b) => a.price - b.price);
+      case 'price-desc': return result.sort((a, b) => b.price - a.price);
+      case 'name-asc': return result.sort((a, b) => a.name.localeCompare(b.name));
+      case 'name-desc': return result.sort((a, b) => b.name.localeCompare(a.name));
+      default: return result;
+    }
+  }, [products, searchTerm, sortOption]);
+
+  const handleAddToCart = (product) => {
+    const existing = cart.find(item => item.id === product.id);
+    let updatedCart;
+    if (existing) {
+      updatedCart = cart.map(item =>
+        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+      );
+    } else {
+      updatedCart = [...cart, { ...product, quantity: 1 }];
+    }
+    setCart(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    alert(`${product.name} ajouté au panier !`);
   };
 
-  const filteredProducts = filter
-    ? products.filter((p) => p.category === filter)
-    : products;
+  if (loading) return <LoadingSpinner />;
+  if (error) return <p>Erreur : {error}</p>;
 
   return (
-    <div className="all-products-container">
-      <h2 className="page-title">Nos Produits</h2>
-      <p>Tous les produits disponibles pour hommes, femmes et enfants.</p>
+    <div className="products-container">
+      <header className="header">
+        <h1>Nos Produits</h1>
+      </header>
 
-      <div className="filters">
-        <button onClick={() => setFilter('')}>Tous</button>
-        <button onClick={() => setFilter('homme')}>Homme</button>
-        <button onClick={() => setFilter('femme')}>Femme</button>
-        <button onClick={() => setFilter('enfant')}>Enfant</button>
-        <button onClick={() => navigate('/cart')} style={{ float: 'right' }}>
-          Voir le panier 🛒 ({cart.length})
-        </button>
+      <div className="search-container">
+        <FiSearch />
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Rechercher un produit"
+        />
       </div>
 
-      {loading ? (
-        <LoadingSpinner />
-      ) : (
-        <div className="products-grid">
-          {filteredProducts.map((product) => (
-            <div className="product-card" key={product.id}>
-              <div className="product-image-container">
-                <img src={product.image} alt={product.name} className="product-image" />
-                <div className="product-category">{product.category}</div>
-                <button
-                  className="add-to-cart-btn"
-                  onClick={() => addToCart(product)}
-                >
-                  + Ajouter
-                </button>
-              </div>
-              <div className="product-info">
-                <h3 className="product-name">{product.name}</h3>
-                <p className="product-price">{product.price} DT</p>
-              </div>
+      <div className="filter-container">
+        <select onChange={(e) => setSortOption(e.target.value)} value={sortOption}>
+          <option value="default">Trier par défaut</option>
+          <option value="price-asc">Prix croissant</option>
+          <option value="price-desc">Prix décroissant</option>
+          <option value="name-asc">Nom A-Z</option>
+          <option value="name-desc">Nom Z-A</option>
+        </select>
+      </div>
+
+      <div className="products-grid">
+        {filteredAndSortedProducts.map((product) => (
+          <article className="product-card" key={product.id}>
+            <div className="product-image">
+              <img src={product.image_url || '/placeholder.jpg'} alt={product.name} />
+              <button className="btn-hover-cart" onClick={() => handleAddToCart(product)}>
+  🛒 Ajouter au panier
+</button>
+
             </div>
-          ))}
-        </div>
-      )}
+            <h3>{product.name}</h3>
+            <p>{product.description}</p>
+            <span>{product.price} DT</span>
+          </article>
+        ))}
+      </div>
     </div>
   );
 };

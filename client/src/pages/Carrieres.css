@@ -1,0 +1,31 @@
+.carrieres-container {
+    max-width: 800px;
+    margin: auto;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #fdfdfd;
+  }
+  
+  .carrieres-title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  
+  .carrieres-intro,
+  .carrieres-contact {
+    margin-bottom: 2rem;
+  }
+  
+  .carrieres-list,
+  .carrieres-benefits {
+    margin-left: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .carrieres-list li,
+  .carrieres-benefits li {
+    margin-bottom: 0.5rem;
+  }
+  

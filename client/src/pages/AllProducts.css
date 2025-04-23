@@ -1,121 +1,99 @@
-/* src/pages/AllProducts.css */
+.products-container {
+  padding: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f9f9f9;
+}
 
-.all-products-container {
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    font-family: 'Segoe UI', sans-serif;
-  }
-  
-  .page-title {
-    text-align: center;
-    margin-bottom: 1rem;
-    color: #222;
-    font-size: 2rem;
-  }
-  
-  .page-description {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #555;
-    font-size: 1rem;
-  }
-  
-  .filters {
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background: #f5f5f5;
-    border-radius: 8px;
-  }
-  
-  .products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 2rem;
-  }
-  
-  .product-card {
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    position: relative;
-  }
-  
-  .product-card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .product-image-container {
-    position: relative;
-    height: 300px;
-    overflow: hidden;
-  }
-  
-  .product-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-  }
-  
-  .product-card:hover .product-image {
-    transform: scale(1.05);
-  }
-  
-  .product-category {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 0.3rem 0.6rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    text-transform: capitalize;
-  }
-  
-  .product-info {
-    padding: 1rem;
-  }
-  
-  .product-name {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #333;
-  }
-  
-  .product-price {
-    font-weight: bold;
-    color: #000;
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  .category-tag {
-    background-color: #eee;
-    color: #333;
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 5px;
-    display: inline-block;
-    margin-bottom: 0.5rem;
-  }
-  
-  .add-to-cart-btn {
-    background: #000;
-    color: white;
-    border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    margin-top: 0.5rem;
-  }
-  
-  .add-to-cart-btn:hover {
-    background: #444;
-  }
-  
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.search-container input {
+  margin-left: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  width: 320px;
+  font-size: 1rem;
+}
+
+.filter-container {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+  justify-content: center;
+}
+
+.product-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 1rem;
+  text-align: center;
+  transition: transform 0.2s;
+  position: relative;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+.product-image {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+  background: #f2f2f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image img {
+  transform: scale(1.05);
+}
+.btn-hover-cart {
+  position: absolute;
+  bottom: -100%;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.5); /* fond noir transparent */
+  color: white;
+  border: none;
+  padding: 0.8rem 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+  opacity: 0;
+  pointer-events: none;
+  text-align: center;
+  transform: translateY(20px);
+  transition: all 0.4s ease-in-out;
+}
+
+.product-image:hover .btn-hover-cart {
+  bottom: 0;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+

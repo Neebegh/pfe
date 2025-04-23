@@ -1,0 +1,159 @@
+/* Container principal de la wishlist */
+.wishlist-container {
+    padding: 40px 20px;
+    background-color: #f4f4f9;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* Titre de la page */
+  .header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  .header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #222;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  
+  .header h2 {
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: #555;
+  }
+  
+  /* Message lorsque la wishlist est vide */
+  h2 {
+    font-size: 1.5rem;
+    color: #555;
+  }
+  
+  h2 span {
+    font-size: 1.8rem;
+    color: #e63946; /* Cœur rouge */
+  }
+  
+  /* Grille de produits */
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    width: 90%;
+    margin-top: 30px;
+    justify-content: center;
+  }
+  
+  /* Carte de produit */
+  .product-card {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    overflow: hidden;
+    text-align: center;
+    padding: 20px;
+    position: relative;
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Image du produit */
+  .product-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-bottom: 20px;
+  }
+  
+  /* Nom du produit */
+  .product-card h3 {
+    font-size: 1.4rem;
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+  
+  /* Description du produit */
+  .product-card p {
+    font-size: 1rem;
+    color: #777;
+    margin-bottom: 20px;
+    line-height: 1.4;
+    height: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Prix du produit */
+  .product-card span {
+    font-size: 1.3rem;
+    color: #f72585; /* Couleur rose du prix */
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+  
+  /* Conteneur des boutons */
+  .buttons-container {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  /* Bouton Retirer */
+  button {
+    background-color: #f72585;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s, transform 0.2s;
+    width: 48%;
+    font-weight: 500;
+  }
+  
+  button:hover {
+    background-color: #7209b7;
+    transform: scale(1.05);
+  }
+  
+  /* Bouton Ajouter au panier */
+  .add-to-cart {
+    background-color: #7209b7;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s, transform 0.2s;
+    width: 48%;
+    font-weight: 500;
+  }
+  
+  .add-to-cart:hover {
+    background-color: #56088c;
+    transform: scale(1.05);
+  }
+  
+  /* Accessibilité - Style pour les emojis */
+  span[role="img"] {
+    font-size: 2rem;
+    display: inline-block;
+    margin-top: 20px;
+  }
+  
