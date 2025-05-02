@@ -1,145 +1,116 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaUser, FaHeart, FaShoppingCart, FaBars, FaTimes, FaChevronDown, FaHeadset } from 'react-icons/fa';
-import { useAuth } from '../../context/AuthContext';
-import { useCart } from '../../context/CartContext';
+import { Link } from 'react-router-dom';
+import { FaBars, FaTimes, FaShoppingCart, FaUser, FaChevronDown } from 'react-icons/fa';
 import './Navbar.css';
+import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [wishlistCount, setWishlistCount] = useState(0);
   const { user, logout } = useAuth();
-  const { cart } = useCart();
-  const navigate = useNavigate();
 
-  const categories = [
-    { name: "Femmes", path: "/femmes", subcategories: ["Robes", "Tops", "Pantalons"] },
-    { name: "Hommes", path: "/hommes", subcategories: ["Chemises", "Jeans", "Vestes"] },
-    { name: "Enfants", path: "/enfants", subcategories: ["Filles", "Garçons", "Bébés"] },
-    { name: "Nouveautés", path: "/nouveautes" }
-  ];
+  const categories = ["Femmes", "Hommes", "Enfants", "Nouveautés"];
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 10);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setIsScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   useEffect(() => {
-    const handleWishlist = () => {
+    const updateWishlist = () => {
       const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
       setWishlistCount(wishlist.length);
     };
-    handleWishlist();
-    window.addEventListener('storage', handleWishlist);
-    return () => window.removeEventListener('storage', handleWishlist);
+    updateWishlist();
+    window.addEventListener('storage', updateWishlist);
+    return () => window.removeEventListener('storage', updateWishlist);
   }, []);
 
-  const handleLogout = () => {
-    logout();
-    setIsUserMenuOpen(false);
-  };
+  const renderHeartIcon = () => wishlistCount > 0 ? (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6 4 4 6.5 4c1.74 0 3.41 1.01 4.13 2.44h1.74C14.09 5.01 15.76 4 17.5 4 20 4 22 6 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+    </svg>
+  ) : (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1A5.5 5.5 0 0 0 3.2 12l1 1 7.6 7.6 7.6-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path>
+    </svg>
+  );
 
   return (
-    <>
-      <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`} aria-label="Navigation principale">
-        <div className="navbar-container">
-          <div className="navbar-brand">
-            <button className="mobile-menu-button" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label="Menu mobile">
-              {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
-            </button>
-            <Link to="/" className="logo-link">
-              <h1 className="logo-text">SmartFashion</h1>
-            </Link>
-          </div>
-
-          <div className="main-navigation">
-            <ul className="nav-menu">
-              {categories.map((category) => (
-                <li key={category.path} className="nav-item">
-                  <div className="category-link">
-                    <Link to={category.path}>{category.name}</Link>
-                    {category.subcategories && (
-                      <>
-                        <FaChevronDown className="dropdown-icon" />
-                        <div className="dropdown-menu">
-                          {category.subcategories.map((sub) => (
-                            <Link
-                              key={sub}
-                              to={`${category.path}/${sub.toLowerCase()}`}
-                              className="dropdown-item"
-                            >
-                              {sub}
-                            </Link>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="navbar-actions">
-            <div className="action-icons">
-              <Link to="/wishlist" className="action-icon" aria-label="Liste de souhaits">
-                <FaHeart />
-                {wishlistCount > 0 && (
-                  <span className="cart-badge">{wishlistCount}</span>
-                )}
+    <header className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
+      <div className="navbar-container">
+        <div className="navbar-left">
+          <Link to="/" className="logo">SmartFashion</Link>
+          <nav className="nav-menu">
+            {categories.map(cat => (
+              <Link key={cat} to={`/${cat.toLowerCase()}`} className="nav-link">
+                {cat} <FaChevronDown className="chevron" />
               </Link>
-
-              <Link to="/cart" className="action-icon cart-icon" aria-label="Panier">
-                <FaShoppingCart />
-                {cart.length > 0 && (
-                  <span className="cart-badge">{cart.reduce((sum, item) => sum + item.quantity, 0)}</span>
-                )}
-              </Link>
-
-              <Link to="/support" className="action-icon service-client-icon" aria-label="Support client">
-                <FaHeadset />
-              </Link>
-
-              {user ? (
-                <div className="user-dropdown">
-                  <button className="user-icon" onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} aria-label="Menu utilisateur">
-                    <FaUser />
-                  </button>
-                  {isUserMenuOpen && (
-                    <div className="dropdown-menu user-menu">
-                      <div className="user-info">Bonjour, {user.email}</div>
-                      <Link to="/account" onClick={() => setIsUserMenuOpen(false)}>Mon compte</Link>
-                      <Link to="/orders" onClick={() => setIsUserMenuOpen(false)}>Mes commandes</Link>
-                      <button onClick={handleLogout} className="logout-btn">Déconnexion</button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="auth-buttons">
-                  <Link to="/login" className="auth-link">Connexion</Link>
-                  <Link to="/register" className="auth-link signup-link">Inscription</Link>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className={`mobile-menu ${isMobileMenuOpen ? 'open' : ''}`}>
-          <ul className="mobile-nav-menu">
-            {categories.map((category) => (
-              <li key={category.path}>
-                <Link to={category.path} onClick={() => setIsMobileMenuOpen(false)}>
-                  {category.name}
-                </Link>
-              </li>
             ))}
-          </ul>
+          </nav>
         </div>
-      </nav>
-    </>
+
+        <div className="navbar-right">
+          <input type="text" className="search" placeholder="🔍 Rechercher..." />
+
+          <Link to="/wishlist" className="icon-link wishlist-icon">
+            <span className="wishlist-wrapper">
+              {renderHeartIcon()}
+              <span className="wishlist-count">{wishlistCount}</span>
+            </span>
+          </Link>
+
+          <Link to="/cart" className="icon-link">
+            <FaShoppingCart />
+          </Link>
+
+          {user ? (
+            <div className="auth-section">
+              <span className="welcome-text">Bonjour, {user.name}</span>
+              <button onClick={logout} className="auth-link logout-btn">Déconnexion</button>
+            </div>
+          ) : (
+            <Link to="/login" className="icon-link">
+              <FaUser />
+            </Link>
+          )}
+
+          <button className="mobile-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
+          </button>
+        </div>
+      </div>
+
+      <div className={`mobile-menu ${isMobileMenuOpen ? 'open' : ''}`}>
+        {categories.map(cat => (
+          <Link key={cat} to={`/${cat.toLowerCase()}`} onClick={() => setIsMobileMenuOpen(false)}>
+            {cat}
+          </Link>
+        ))}
+
+        {user ? (
+          <>
+            <span className="welcome-text">Bonjour, {user.name}</span>
+            <button
+              onClick={() => {
+                logout();
+                setIsMobileMenuOpen(false);
+              }}
+              className="auth-link logout-btn"
+            >
+              Déconnexion
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>Connexion</Link>
+            <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>Inscription</Link>
+          </>
+        )}
+      </div>
+    </header>
   );
 };
 

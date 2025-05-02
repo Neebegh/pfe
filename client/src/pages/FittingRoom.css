@@ -1,0 +1,136 @@
+.fitting-room-container {
+  max-width: 600px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+.fitting-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fitting-form input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.btn-validate, .btn-webcam, .btn-back, .btn-reset, .btn-login {
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.btn-validate {
+  background-color: #27ae60;
+  color: white;
+}
+
+.btn-validate:hover {
+  background-color: #219150;
+}
+
+.btn-webcam {
+  background-color: #6c5ce7;
+  color: white;
+}
+
+.btn-webcam:hover {
+  background-color: #5a4bd6;
+}
+
+.btn-back {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-back:hover {
+  background-color: #2980b9;
+}
+
+.btn-reset {
+  background-color: #f39c12;
+  color: white;
+}
+
+.btn-reset:hover {
+  background-color: #d68910;
+}
+
+.error-text {
+  color: #e74c3c;
+  background-color: #ffe6e6;
+  padding: 10px;
+  border: 1px solid #e74c3c;
+  border-radius: 8px;
+  margin-top: -10px;
+  font-weight: bold;
+}
+
+.success-text {
+  color: #2ecc71;
+  font-size: 24px;
+  margin-bottom: 1rem;
+}
+
+.result-section {
+  margin-top: 2rem;
+  text-align: center;
+  animation: popIn 0.7s ease-in-out;
+}
+
+.recommendation span {
+  font-weight: bold;
+  color: #2980b9;
+}
+
+.profile-message strong {
+  font-weight: bold;
+  color: #8e44ad;
+}
+
+.alert-connection {
+  background-color: #ffdddd;
+  color: #c0392b;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e74c3c;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.btn-login {
+  margin-left: 10px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 7px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-login:hover {
+  background-color: #c0392b;
+}
+
+/* ✅ Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}

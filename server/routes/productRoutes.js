@@ -3,16 +3,21 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db'); // Connexion PostgreSQL
 
-// GET /api/products - Récupérer tous les produits
-router.get('/products', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM products ORDER BY id ASC');
-    console.log(result.rows); // Ajoute cette ligne avant res.json(...)
+// GET /api/products/:id - Récupérer un produit par ID
+router.get('/products/:id', async (req, res) => {
+  const productId = req.params.id;
 
-    res.json({ success: true, products: result.rows });
+  try {
+    const result = await pool.query('SELECT * FROM products WHERE id = $1', [productId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Produit introuvable' });
+    }
+
+    res.json(result.rows[0]);
   } catch (err) {
-    console.error('Erreur lors du chargement des produits :', err);
-    res.status(500).json({ success: false, message: 'Erreur serveur' });
+    console.error('Erreur lors de la récupération du produit :', err);
+    res.status(500).json({ message: 'Erreur serveur' });
   }
 });
 

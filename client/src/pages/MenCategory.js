@@ -1,31 +1,58 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './CategoryPage.css';
+import { useAuth } from '../context/AuthContext';
+import ReportPopup from '../components/ui/ReportPopup';
 
 const MenCategory = () => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [wishlist, setWishlist] = useState(() => {
-    const saved = localStorage.getItem('wishlist');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [cart, setCart] = useState(() => {
-    const saved = localStorage.getItem('cart');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [wishlist, setWishlist] = useState(() => JSON.parse(localStorage.getItem('wishlist')) || []);
+  const [cart, setCart] = useState(() => JSON.parse(localStorage.getItem('cart')) || []);
+  const [comments, setComments] = useState({});
+  const [submittedReviews, setSubmittedReviews] = useState({});
+  const [productReviews, setProductReviews] = useState({});
+  const [popupProductId, setPopupProductId] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch('http://localhost:5000/api/products')
       .then(res => res.json())
-      .then(data => setProducts(data.products || []));
+      .then(data => {
+        setProducts(data.products || []);
+        data.products.forEach(p => {
+          if (p.category === 'hommes') loadReviews(p.id);
+        });
+      });
+
+    const fittingSuccess = sessionStorage.getItem('fittingSuccess');
+    if (fittingSuccess) {
+      setSuccessMessage('✅ Essayage terminé ! Vous pouvez ajouter au panier.');
+      sessionStorage.removeItem('fittingSuccess');
+      setTimeout(() => setSuccessMessage(''), 3000);
+    }
   }, []);
 
-  const womenProducts = useMemo(() => {
+  const menProducts = useMemo(() => {
     return products
       .filter(p => p.category === 'hommes')
       .filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [products, searchTerm]);
 
+  const handleGoToFittingRoom = (productId) => {
+    navigate('/fitting-room', { state: { productId } });
+  };
+
   const handleAddToCart = (product) => {
+    const fitting = JSON.parse(localStorage.getItem('fittingDone')) || {};
+
+    if (!fitting[product.id]) {
+      alert('⚠️ Faites un essayage avant d\'ajouter au panier.');
+      return;
+    }
+
     const exists = cart.find(item => item.id === product.id);
     const updatedCart = exists
       ? cart.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item)
@@ -37,8 +64,7 @@ const MenCategory = () => {
   };
 
   const toggleWishlist = (product) => {
-    const exists = wishlist.find(item => item.id === product.id);
-    const updated = exists
+    const updated = wishlist.some(item => item.id === product.id)
       ? wishlist.filter(item => item.id !== product.id)
       : [...wishlist, product];
 
@@ -49,21 +75,117 @@ const MenCategory = () => {
 
   const isInWishlist = (id) => wishlist.some(p => p.id === id);
 
+  const handleCommentChange = (id, value) => {
+    setComments(prev => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  const handleSubmitReview = async (productId) => {
+    const product = products.find(p => String(p.id) === String(productId));
+  
+    if (!product) {
+      alert("Produit introuvable.");
+      return;
+    }
+  
+    try {
+      console.log("📤 Envoi des données :", {
+        userEmail: user.email,
+        userName: user.name,
+        comment: comments[productId],
+        productImage: product.image_url,
+        productName: product.name
+      });
+  
+      const res = await fetch(`http://localhost:5000/api/reviews/${productId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userEmail: user.email,
+          userName: user.name,
+          comment: comments[productId],
+          productImage: product.image_url,
+          productName: product.name
+        })
+      });
+  
+      const data = await res.json();
+  
+      if (res.ok) {
+        alert('✅ Avis enregistré !');
+        setSubmittedReviews(prev => ({ ...prev, [productId]: true }));
+        loadReviews(productId);
+      } else {
+        alert(data.message || 'Erreur serveur lors de l’envoi.');
+      }
+    } catch (error) {
+      console.error('❌ Erreur réseau :', error);
+      alert('Erreur de connexion au serveur.');
+    }
+  };
+  
+  
+
+  const loadReviews = async (productId) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/reviews/${productId}`);
+      const data = await res.json();
+      setProductReviews(prev => ({ ...prev, [productId]: data.reviews }));
+    } catch (err) {
+      console.error('Erreur lors du chargement des avis', err);
+    }
+  };
+
+  const handleDeleteReview = async (reviewId, productId) => {
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cet avis ?")) return;
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/reviews/${reviewId}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        setProductReviews(prev => ({
+          ...prev,
+          [productId]: prev[productId].filter(r => r.id !== reviewId),
+        }));
+        alert('Avis supprimé avec succès.');
+      } else {
+        const data = await res.json();
+        alert(data.message || 'Erreur lors de la suppression.');
+      }
+    } catch (error) {
+      alert('Erreur serveur.');
+      console.error(error);
+    }
+  };
+
+  // Fonction pour voir les avis
+  const handleViewReviews = (productId) => {
+    navigate(`/product-reviews/${productId}`);
+  };
+
   return (
     <div className="category-modern-container">
-      <h1>Produits pour Hommes</h1>
+      <h1 className="page-title">Notre sélection pour Hommes</h1>
+
+      {successMessage && (
+        <div className="success-message">{successMessage}</div>
+      )}
 
       <div className="search-modern">
         <input
           type="text"
-          placeholder="Rechercher un produit"
+          placeholder="🔍 Rechercher un produit"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
       <div className="product-modern-grid">
-        {womenProducts.map(product => (
+        {menProducts.map(product => (
           <div className="product-modern-card" key={product.id}>
             <div className="image-wrapper">
               <img src={product.image_url} alt={product.name} />
@@ -82,10 +204,61 @@ const MenCategory = () => {
             <div className="info-zone">
               <p className="product-name">{product.name}</p>
               <p className="product-price">{product.price} DT</p>
+
+              <button
+                className="btn-fitting-room"
+                onClick={() => navigate('/fitting-room', { state: { productId: product.id, productImage: product.image_url, productName: product.name } })}
+              >
+                🎯 Faire un Essayage
+              </button>
+
+              <button onClick={() => setPopupProductId(product.id)} className="report-btn">
+                🚩 Signaler un problème
+              </button>
+
+              {/* Lien Voir les avis */}
+              <button onClick={() => handleViewReviews(product.id)} className="view-reviews-btn">
+                Voir les avis
+              </button>
             </div>
+
+            {/* Avis client */}
+            {user ? (
+              <div className="product-review-section">
+                <label htmlFor={`review-${product.id}`} className="review-label">
+                  Laisser un avis client :
+                </label>
+                <textarea
+                  id={`review-${product.id}`}
+                  className="review-textarea"
+                  placeholder="Partagez votre expérience avec ce produit..."
+                  value={comments[product.id] || ''}
+                  onChange={(e) => handleCommentChange(product.id, e.target.value)}
+                />
+                <button
+                  className="review-submit-btn"
+                  onClick={() => handleSubmitReview(product.id)}
+                  disabled={!comments[product.id] || comments[product.id].trim() === ''}
+                >
+                  Envoyer l’avis
+                </button>
+                {submittedReviews[product.id] && (
+                  <span>✅ Merci pour votre avis !</span>
+                )}
+              </div>
+            ) : (
+              <p className="review-login-message">
+                <Link to="/login">Connectez-vous</Link> pour laisser un avis.
+              </p>
+            )}
           </div>
         ))}
       </div>
+
+      {/* Popup signalement */}
+      {popupProductId && (
+        <ReportPopup isOpen={true} onClose={() => setPopupProductId(null)} productId={popupProductId} />
+      )}
     </div>
   );
 };

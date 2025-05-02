@@ -1,0 +1,170 @@
+/* Fond de la popup */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* Contenu de la popup */
+.popup-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Bouton de fermeture de la popup */
+.popup-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #333;
+}
+
+.popup-close:hover {
+  color: var(--danger);
+}
+
+/* Titre de la popup */
+h2 {
+  font-size: 1.5rem;
+  color: var(--primary);
+  margin-bottom: 15px;
+}
+
+/* Zone de saisie pour le signalement */
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+label {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 5px;
+  display: block;
+}
+
+select, textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  background: #f9f9f9;
+  color: #333;
+  resize: vertical;
+  transition: 0.3s;
+}
+
+select:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 5px rgba(106, 90, 205, 0.3);
+}
+
+/* Bouton d'envoi */
+.popup-submit-btn {
+  background: var(--accent);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  transition: 0.3s;
+}
+
+.popup-submit-btn:hover {
+  background: #5a4bb3;
+}
+
+/* Message de succès */
+.success-message {
+  margin-top: 10px;
+  background: lightgreen;
+  color: darkgreen;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1rem;
+}
+
+/* Confirmation avant suppression */
+.delete-confirmation {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 400px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.delete-reason-textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  background: #f9f9f9;
+  color: #333;
+  resize: vertical;
+  transition: 0.3s;
+}
+
+.confirmation-buttons {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.confirm-delete-btn,
+.cancel-delete-btn {
+  background: var(--accent);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.confirm-delete-btn:hover {
+  background-color: #5a4bb3;
+}
+
+.cancel-delete-btn {
+  background: #ccc;
+}
+
+.cancel-delete-btn:hover {
+  background-color: #aaa;
+}
+
+/* Message d'erreur */
+.error-message {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}

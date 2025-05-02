@@ -19,9 +19,10 @@ app.use(cookieParser());
 // Routes
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
-
+const reviewRoutes = require('./routes/reviewRoutes');
 app.use('/api', userRoutes);
 app.use('/api', productRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // Lancement du serveur
 const PORT = 5000;

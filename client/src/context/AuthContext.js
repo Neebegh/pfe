@@ -11,7 +11,11 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        return { email: decoded.email, token };
+        return {
+          email: decoded.email,
+          name: decoded.username,  // ✅ ici !
+          token
+        };
       } catch (error) {
         localStorage.removeItem('authToken');
         return null;
@@ -26,18 +30,22 @@ export const AuthProvider = ({ children }) => {
         email,
         password
       });
-      
+
       const { token } = response.data;
       localStorage.setItem('authToken', token);
       const decoded = jwtDecode(token);
-      setUser({ email: decoded.email, token });
-      
+      setUser({
+        email: decoded.email,
+        name: decoded.username,  // ✅ ici !
+        token
+      });
+
       return { success: true };
     } catch (error) {
       console.error('Registration error:', error.response?.data);
-      return { 
-        success: false, 
-        error: error.response?.data?.message || 'Erreur lors de l’inscription' 
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Erreur lors de l’inscription'
       };
     }
   }, []);
@@ -48,18 +56,22 @@ export const AuthProvider = ({ children }) => {
         email,
         password
       });
-      
+
       const { token } = response.data;
       localStorage.setItem('authToken', token);
       const decoded = jwtDecode(token);
-      setUser({ email: decoded.email, token });
-      
+      setUser({
+        email: decoded.email,
+        name: decoded.username,  // ✅ ici aussi !
+        token
+      });
+
       return { success: true };
     } catch (error) {
       console.error('Login error:', error.response?.data);
-      return { 
-        success: false, 
-        error: error.response?.data?.message || 'Email ou mot de passe incorrect' 
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Email ou mot de passe incorrect'
       };
     }
   }, []);
@@ -84,5 +96,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// ✅ Le hook manquant !
 export const useAuth = () => useContext(AuthContext);

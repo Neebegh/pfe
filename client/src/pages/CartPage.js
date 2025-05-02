@@ -14,23 +14,27 @@ const CartPage = () => {
   const [discount, setDiscount] = useState(0);
   const navigate = useNavigate();
 
-  // Met à jour le localStorage lorsque le panier change
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
   const removeFromCart = (id) => {
     setCart((prev) => prev.filter((item) => item.id !== id));
+    localStorage.setItem('cart', JSON.stringify(cart));
+    window.dispatchEvent(new Event("storage"));
   };
 
   const updateQuantity = (id, amount) => {
-    setCart((prev) =>
-      prev.map((item) =>
+    setCart((prev) => {
+      const updated = prev.map((item) =>
         item.id === id
           ? { ...item, quantity: Math.max(1, item.quantity + amount) }
           : item
-      )
-    );
+      );
+      localStorage.setItem('cart', JSON.stringify(updated));
+      window.dispatchEvent(new Event("storage"));
+      return updated;
+    });
   };
 
   const applyCoupon = () => {
@@ -53,6 +57,7 @@ const CartPage = () => {
     setIsProcessing(true);
     setTimeout(() => {
       localStorage.removeItem('cart');
+      window.dispatchEvent(new Event("storage"));
       navigate('/checkout/success');
     }, 1500);
   };
@@ -83,7 +88,10 @@ const CartPage = () => {
             {cart.map((item) => (
               <div className="cart-item" key={item.id}>
                 <div className="item-image">
-                  <img src={item.image} alt={item.name} />
+                  <img
+                    src={item.image || item.image_url || '/images/default.jpg'}
+                    alt={item.name}
+                  />
                 </div>
                 <div className="item-details">
                   <h3>{item.name}</h3>

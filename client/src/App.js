@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useCart } from './context/CartContext';
 import Navbar from './components/layout/Navbar';
-import Footer from './components/layout/Footer'; // Importez le Footer
+import Footer from './components/layout/Footer';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import Login from './pages/Login';
@@ -19,8 +19,9 @@ import Retours from './pages/Retours';
 import Carrieres from './pages/Carrieres';
 import Presse from './pages/Presse';
 import Wishlist from './pages/Wishlist';
-
-
+import FittingRoom from './pages/FittingRoom';
+import SnapFittingRoom from './pages/SnapFittingRoom';
+import ProductReviews from './pages/ProductReviews';
 const App = () => {
   const { cart } = useCart();
 
@@ -34,9 +35,13 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          
+          {/* Catégories */}
           <Route path="/hommes" element={<MenCategory />} />
           <Route path="/femmes" element={<WomenCategory />} />
           <Route path="/enfants" element={<KidsCategory />} />
+          
+          {/* Autres pages */}
           <Route path="/cart" element={<CartPage />} />
           <Route path="/notre-histoire" element={<NotreHistoire />} />
           <Route path="/contact" element={<Contact />} />
@@ -44,11 +49,15 @@ const App = () => {
           <Route path="/retours" element={<Retours />} />
           <Route path="/carrieres" element={<Carrieres />} />
           <Route path="/presse" element={<Presse />} />
+          <Route path="/wishlist" element={<Wishlist />} />
           
-<Route path="/wishlist" element={<Wishlist />} />
+          {/* Pages spécifiques aux produits */}
+          <Route path="/fitting-room" element={<FittingRoom />} />
+          <Route path="/snap-fitting-room" element={<SnapFittingRoom />} />
+          <Route path="/product-reviews/:productId" element={<ProductReviews />} /> 
         </Routes>
       </div>
-      <Footer /> {/* Ajoutez le Footer ici */}
+      <Footer />
     </>
   );
 };

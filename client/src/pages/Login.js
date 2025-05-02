@@ -1,39 +1,26 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import '../styles/Auth.css';
+import { useAuth } from '../context/AuthContext'; // 🔥 Ajout
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth(); // 🔥 Ajout
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      const res = await fetch('http://localhost:5000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
+    const result = await login(email, password); // 🔥 utilise ton contexte
+    setIsLoading(false);
 
-      const data = await res.json();
-      setIsLoading(false);
-
-      if (res.ok) {
-        alert('Connexion réussie 🎉');
-        localStorage.setItem('token', data.token);
-        // Redirige vers le tableau de bord ou une autre page
-        navigate('/dashboard');
-      } else {
-        alert(data.message || 'Erreur de connexion');
-      }
-    } catch (error) {
-      setIsLoading(false);
-      console.error('Erreur réseau :', error);
-      alert('Erreur de connexion au serveur.');
+    if (result.success) {
+      navigate('/'); // ✅ redirection vers accueil
+    } else {
+      alert(result.error || 'Erreur de connexion');
     }
   };
 
@@ -68,9 +55,13 @@ const Login = () => {
           {isLoading && <span className="auth-loading"></span>}
         </button>
       </form>
+
+      <div className="auth-footer">
+        <span>Pas encore de compte ? </span>
+        <Link to="/register" className="auth-link">Créer un compte</Link>
+      </div>
     </div>
   );
 };
 
 export default Login;
-
