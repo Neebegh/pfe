@@ -16,6 +16,7 @@ const KidsCategory = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [showLoginMessage, setShowLoginMessage] = useState(false);
 
   useEffect(() => {
     fetch('http://localhost:5000/api/products')
@@ -148,6 +149,14 @@ const KidsCategory = () => {
     navigate(`/product-reviews/${productId}`);
   };
 
+  const handleOpenReportPopup = (productId) => {
+    if (!user) {
+      alert("Veuillez vous connecter pour signaler un problème.");
+      return;
+    }
+    setPopupProductId(productId);
+  };
+
   return (
     <div className="category-modern-container">
       <h1 className="page-title">Notre sélection pour Enfants</h1>
@@ -162,19 +171,32 @@ const KidsCategory = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
+      {showLoginMessage && (
+  <div className="login-toast">
+    🚫 Veuillez vous <Link to="/login" className="login-link">vous connecter</Link> pour signaler un problème.
+  </div>
+)}
 
       <div className="product-modern-grid">
         {kidsProducts.map(product => (
           <div className="product-modern-card" key={product.id}>
             <div className="image-wrapper">
-              <img src={product.image_url} alt={product.name} />
-              {product.isNew && <span className="badge-new">Nouveauté</span>}
+              <img
+                src={product.image_url.startsWith('http')
+                  ? product.image_url
+                  : `http://localhost:5000${product.image_url}`}
+                alt={product.name}
+              />
+
+              {product.is_new && <span className="badge-new">Nouveau</span>}
+
               <button
                 className={`heart-wishlist ${isInWishlist(product.id) ? 'active' : ''}`}
                 onClick={() => toggleWishlist(product)}
               >
                 {isInWishlist(product.id) ? '❤️' : '🤍'}
               </button>
+
               <button className="btn-hover-cart" onClick={() => handleAddToCart(product)}>
                 Ajouter au panier
               </button>
@@ -195,9 +217,21 @@ const KidsCategory = () => {
                 🎯 Faire un Essayage
               </button>
 
-              <button onClick={() => setPopupProductId(product.id)} className="report-btn">
+              <button
+                onClick={() => {
+                if (!user) {
+                 setShowLoginMessage(true);
+                  setTimeout(() => setShowLoginMessage(false), 3000); // auto hide after 3s
+                } else {
+                    setPopupProductId(product.id);
+                  }
+                   }}
+                  className="report-btn"
+                >
                 🚩 Signaler un problème
-              </button>
+                </button>
+
+
 
               <button onClick={() => handleViewReviews(product.id)} className="view-reviews-btn">
                 Voir les avis
@@ -234,8 +268,14 @@ const KidsCategory = () => {
         ))}
       </div>
 
-      {popupProductId && (
-        <ReportPopup isOpen={true} onClose={() => setPopupProductId(null)} productId={popupProductId} />
+      {popupProductId && user && (
+       <ReportPopup
+       isOpen={true}
+       onClose={() => setPopupProductId(null)}
+       product={products.find(p => p.id === popupProductId)}
+       user={user}
+     />
+     
       )}
     </div>
   );

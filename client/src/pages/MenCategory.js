@@ -16,6 +16,7 @@ const MenCategory = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const { user } = useAuth();
   const navigate = useNavigate();
+ const [showLoginMessage, setShowLoginMessage] = useState(false);
 
   useEffect(() => {
     fetch('http://localhost:5000/api/products')
@@ -35,15 +36,11 @@ const MenCategory = () => {
     }
   }, []);
 
-  const menProducts = useMemo(() => {
+  const womenProducts = useMemo(() => {
     return products
       .filter(p => p.category === 'hommes')
       .filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [products, searchTerm]);
-
-  const handleGoToFittingRoom = (productId) => {
-    navigate('/fitting-room', { state: { productId } });
-  };
 
   const handleAddToCart = (product) => {
     const fitting = JSON.parse(localStorage.getItem('fittingDone')) || {};
@@ -76,29 +73,14 @@ const MenCategory = () => {
   const isInWishlist = (id) => wishlist.some(p => p.id === id);
 
   const handleCommentChange = (id, value) => {
-    setComments(prev => ({
-      ...prev,
-      [id]: value,
-    }));
+    setComments(prev => ({ ...prev, [id]: value }));
   };
 
   const handleSubmitReview = async (productId) => {
     const product = products.find(p => String(p.id) === String(productId));
-  
-    if (!product) {
-      alert("Produit introuvable.");
-      return;
-    }
-  
+    if (!product) return alert("Produit introuvable.");
+
     try {
-      console.log("📤 Envoi des données :", {
-        userEmail: user.email,
-        userName: user.name,
-        comment: comments[productId],
-        productImage: product.image_url,
-        productName: product.name
-      });
-  
       const res = await fetch(`http://localhost:5000/api/reviews/${productId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -110,23 +92,27 @@ const MenCategory = () => {
           productName: product.name
         })
       });
-  
+
       const data = await res.json();
-  
+
       if (res.ok) {
-        alert('✅ Avis enregistré !');
         setSubmittedReviews(prev => ({ ...prev, [productId]: true }));
         loadReviews(productId);
+        setTimeout(() => {
+          setSubmittedReviews(prev => {
+            const updated = { ...prev };
+            delete updated[productId];
+            return updated;
+          });
+        }, 2000);
       } else {
-        alert(data.message || 'Erreur serveur lors de l’envoi.');
+        alert(data.message || 'Erreur lors de l’envoi de l’avis.');
       }
     } catch (error) {
-      console.error('❌ Erreur réseau :', error);
       alert('Erreur de connexion au serveur.');
+      console.error(error);
     }
   };
-  
-  
 
   const loadReviews = async (productId) => {
     try {
@@ -142,9 +128,7 @@ const MenCategory = () => {
     if (!window.confirm("Êtes-vous sûr de vouloir supprimer cet avis ?")) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/reviews/${reviewId}`, {
-        method: 'DELETE',
-      });
+      const res = await fetch(`http://localhost:5000/api/reviews/${reviewId}`, { method: 'DELETE' });
 
       if (res.ok) {
         setProductReviews(prev => ({
@@ -162,7 +146,6 @@ const MenCategory = () => {
     }
   };
 
-  // Fonction pour voir les avis
   const handleViewReviews = (productId) => {
     navigate(`/product-reviews/${productId}`);
   };
@@ -171,9 +154,7 @@ const MenCategory = () => {
     <div className="category-modern-container">
       <h1 className="page-title">Notre sélection pour Hommes</h1>
 
-      {successMessage && (
-        <div className="success-message">{successMessage}</div>
-      )}
+      {successMessage && <div className="success-message">{successMessage}</div>}
 
       <div className="search-modern">
         <input
@@ -183,13 +164,26 @@ const MenCategory = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
+    {showLoginMessage && (
+  <div className="login-toast">
+    🚫 Veuillez vous <Link to="/login" className="login-link">vous connecter</Link> pour signaler un problème.
+  </div>
+)}
 
       <div className="product-modern-grid">
-        {menProducts.map(product => (
+        {womenProducts.map(product => (
           <div className="product-modern-card" key={product.id}>
             <div className="image-wrapper">
-              <img src={product.image_url} alt={product.name} />
-              {product.isNew && <span className="badge-new">Nouveauté</span>}
+            <img
+  src={
+    product.image_url.startsWith('http')
+      ? product.image_url
+      : `http://localhost:5000${product.image_url}`
+  }
+  alt={product.name}
+/>
+
+{product.is_new && <span className="badge-new">Nouveau</span>}
               <button
                 className={`heart-wishlist ${isInWishlist(product.id) ? 'active' : ''}`}
                 onClick={() => toggleWishlist(product)}
@@ -207,22 +201,36 @@ const MenCategory = () => {
 
               <button
                 className="btn-fitting-room"
-                onClick={() => navigate('/fitting-room', { state: { productId: product.id, productImage: product.image_url, productName: product.name } })}
+                onClick={() =>
+                  navigate('/fitting-room', {
+                    state: { productId: product.id, productImage: product.image_url, productName: product.name }
+                  })
+                }
               >
                 🎯 Faire un Essayage
               </button>
 
-              <button onClick={() => setPopupProductId(product.id)} className="report-btn">
+              <button
+                onClick={() => {
+                if (!user) {
+                 setShowLoginMessage(true);
+                  setTimeout(() => setShowLoginMessage(false), 3000); // auto hide after 3s
+                } else {
+                    setPopupProductId(product.id);
+                  }
+                   }}
+                  className="report-btn"
+                >
                 🚩 Signaler un problème
-              </button>
+                </button>
 
-              {/* Lien Voir les avis */}
+
+
               <button onClick={() => handleViewReviews(product.id)} className="view-reviews-btn">
                 Voir les avis
               </button>
             </div>
 
-            {/* Avis client */}
             {user ? (
               <div className="product-review-section">
                 <label htmlFor={`review-${product.id}`} className="review-label">
@@ -242,9 +250,7 @@ const MenCategory = () => {
                 >
                   Envoyer l’avis
                 </button>
-                {submittedReviews[product.id] && (
-                  <span>✅ Merci pour votre avis !</span>
-                )}
+                {submittedReviews[product.id] && <span>✅ Merci pour votre avis !</span>}
               </div>
             ) : (
               <p className="review-login-message">
@@ -255,9 +261,14 @@ const MenCategory = () => {
         ))}
       </div>
 
-      {/* Popup signalement */}
       {popupProductId && (
-        <ReportPopup isOpen={true} onClose={() => setPopupProductId(null)} productId={popupProductId} />
+        <ReportPopup
+        isOpen={true}
+        onClose={() => setPopupProductId(null)}
+        product={products.find(p => p.id === popupProductId)}
+        user={user}
+      />
+      
       )}
     </div>
   );

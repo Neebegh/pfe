@@ -13,7 +13,8 @@ export const AuthProvider = ({ children }) => {
         const decoded = jwtDecode(token);
         return {
           email: decoded.email,
-          name: decoded.username,  // ✅ ici !
+          name: decoded.username,
+          is_admin: decoded.is_admin,
           token
         };
       } catch (error) {
@@ -24,22 +25,15 @@ export const AuthProvider = ({ children }) => {
     return null;
   });
 
-  const register = useCallback(async (email, password) => {
+  const register = useCallback(async (username, email, password) => {
     try {
       const response = await axios.post('http://localhost:5000/api/register', {
+        username,
         email,
         password
       });
 
-      const { token } = response.data;
-      localStorage.setItem('authToken', token);
-      const decoded = jwtDecode(token);
-      setUser({
-        email: decoded.email,
-        name: decoded.username,  // ✅ ici !
-        token
-      });
-
+      // facultatif : faire login auto ici si le backend renvoie un token
       return { success: true };
     } catch (error) {
       console.error('Registration error:', error.response?.data);
@@ -57,16 +51,17 @@ export const AuthProvider = ({ children }) => {
         password
       });
 
-      const { token } = response.data;
+      const { token, user: userData } = response.data;
       localStorage.setItem('authToken', token);
-      const decoded = jwtDecode(token);
+
       setUser({
-        email: decoded.email,
-        name: decoded.username,  // ✅ ici aussi !
+        email: userData.email,
+        name: userData.username,
+        is_admin: userData.is_admin,
         token
       });
 
-      return { success: true };
+      return { success: true, user: userData };
     } catch (error) {
       console.error('Login error:', error.response?.data);
       return {
@@ -81,16 +76,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   }, []);
 
-  const value = {
-    user,
-    isAuthenticated: !!user,
-    register,
-    login,
-    logout
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

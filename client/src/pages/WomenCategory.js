@@ -16,7 +16,7 @@ const WomenCategory = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const { user } = useAuth();
   const navigate = useNavigate();
-
+const [showLoginMessage, setShowLoginMessage] = useState(false);
   useEffect(() => {
     fetch('http://localhost:5000/api/products')
       .then(res => res.json())
@@ -163,13 +163,26 @@ const WomenCategory = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
+      {showLoginMessage && (
+  <div className="login-toast">
+    🚫 Veuillez vous <Link to="/login" className="login-link">vous connecter</Link> pour signaler un problème.
+  </div>
+)}
 
       <div className="product-modern-grid">
         {womenProducts.map(product => (
           <div className="product-modern-card" key={product.id}>
             <div className="image-wrapper">
-              <img src={product.image_url} alt={product.name} />
-              {product.isNew && <span className="badge-new">Nouveauté</span>}
+            <img
+  src={
+    product.image_url.startsWith('http')
+      ? product.image_url
+      : `http://localhost:5000${product.image_url}`
+  }
+  alt={product.name}
+/>
+
+{product.is_new && <span className="badge-new">Nouveau</span>}
               <button
                 className={`heart-wishlist ${isInWishlist(product.id) ? 'active' : ''}`}
                 onClick={() => toggleWishlist(product)}
@@ -195,10 +208,22 @@ const WomenCategory = () => {
               >
                 🎯 Faire un Essayage
               </button>
-
-              <button onClick={() => setPopupProductId(product.id)} className="report-btn">
+              <button
+                onClick={() => {
+                if (!user) {
+                 setShowLoginMessage(true);
+                  setTimeout(() => setShowLoginMessage(false), 3000); // auto hide after 3s
+                } else {
+                    setPopupProductId(product.id);
+                    
+                  }
+                   }}
+                  className="report-btn"
+                >
                 🚩 Signaler un problème
-              </button>
+                </button>
+
+
 
               <button onClick={() => handleViewReviews(product.id)} className="view-reviews-btn">
                 Voir les avis
@@ -236,7 +261,13 @@ const WomenCategory = () => {
       </div>
 
       {popupProductId && (
-        <ReportPopup isOpen={true} onClose={() => setPopupProductId(null)} productId={popupProductId} />
+        <ReportPopup
+        isOpen={true}
+        onClose={() => setPopupProductId(null)}
+        product={products.find(p => p.id === popupProductId)}
+        user={user}
+      />
+      
       )}
     </div>
   );

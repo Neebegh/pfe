@@ -8,6 +8,7 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [hasNewProducts, setHasNewProducts] = useState(false);
   const { user, logout } = useAuth();
 
   const categories = ["Femmes", "Hommes", "Enfants", "Nouveautés"];
@@ -28,6 +29,17 @@ const Navbar = () => {
     return () => window.removeEventListener('storage', updateWishlist);
   }, []);
 
+  useEffect(() => {
+    fetch('http://localhost:5000/api/products/new')
+      .then(res => res.json())
+      .then(data => {
+        if (data.products && data.products.length > 0) {
+          setHasNewProducts(true);
+        }
+      })
+      .catch(() => setHasNewProducts(false));
+  }, []);
+
   const renderHeartIcon = () => wishlistCount > 0 ? (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
       <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6 4 4 6.5 4c1.74 0 3.41 1.01 4.13 2.44h1.74C14.09 5.01 15.76 4 17.5 4 20 4 22 6 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
@@ -46,7 +58,9 @@ const Navbar = () => {
           <nav className="nav-menu">
             {categories.map(cat => (
               <Link key={cat} to={`/${cat.toLowerCase()}`} className="nav-link">
-                {cat} <FaChevronDown className="chevron" />
+                {cat}
+             
+                <FaChevronDown className="chevron" />
               </Link>
             ))}
           </nav>

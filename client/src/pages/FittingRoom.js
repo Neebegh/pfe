@@ -23,7 +23,6 @@ const FittingRoom = () => {
       navigate('/products');
     }
   }, [navigate, productId]);
-  
 
   const handleSizeRecommendation = (h, w) => {
     const bmi = w / Math.pow(h / 100, 2);
@@ -69,12 +68,8 @@ const FittingRoom = () => {
     navigate(-1);
   };
 
-  const handleGoToWebcam = () => {
-    if (!user) {
-      setError('❌ Vous devez être connecté pour utiliser la cabine caméra.');
-      return;
-    }
-    navigate('/webcam-fitting-room', { state: { productId } });
+  const handleGoToAvatar = () => {
+    navigate('/create-avatar');
   };
 
   return (
@@ -119,18 +114,16 @@ const FittingRoom = () => {
             Valider l'essayage ✅
           </button>
 
-         
+          <button type="button" className="btn-avatar" onClick={handleGoToAvatar}>
+            👤 Créer mon avatar
+          </button>
         </form>
       ) : (
         <div className="result-section success-animation">
           <h2 className="success-text">✅ Profil détecté avec succès !</h2>
-
-          {/* ✅ Avatar 3D généré selon les mesures */}
           <div style={{ marginBottom: '1rem' }}>
-          <Avatar3D profile={profileType} />
-
+            <Avatar3D profile={profileType} />
           </div>
-
           <h3>🔎 Taille recommandée : <span>{recommendedSize}</span></h3>
           <p>🧠 Type de morphologie : <strong>{profileType}</strong></p>
 

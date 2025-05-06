@@ -1,24 +1,29 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import '../styles/Auth.css';
-import { useAuth } from '../context/AuthContext'; // 🔥 Ajout
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth(); // 🔥 Ajout
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const result = await login(email, password); // 🔥 utilise ton contexte
+    const result = await login(email, password);
     setIsLoading(false);
 
     if (result.success) {
-      navigate('/'); // ✅ redirection vers accueil
+      // ✅ Redirection directe selon le rôle
+      if (result.user?.is_admin) {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } else {
       alert(result.error || 'Erreur de connexion');
     }
@@ -51,8 +56,7 @@ const Login = () => {
         </div>
 
         <button type="submit" className="auth-btn" disabled={isLoading}>
-          Se connecter
-          {isLoading && <span className="auth-loading"></span>}
+          Se connecter {isLoading && <span className="auth-loading"></span>}
         </button>
       </form>
 

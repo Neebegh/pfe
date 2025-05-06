@@ -11,6 +11,8 @@ import Dashboard from './pages/Dashboard';
 import MenCategory from './pages/MenCategory';
 import WomenCategory from './pages/WomenCategory';
 import KidsCategory from './pages/KidsCategory';
+import NewProducts from './pages/NewProducts';
+
 import CartPage from './pages/CartPage';
 import NotreHistoire from './pages/NotreHistoire';
 import Contact from './pages/Contact';
@@ -22,6 +24,12 @@ import Wishlist from './pages/Wishlist';
 import FittingRoom from './pages/FittingRoom';
 import SnapFittingRoom from './pages/SnapFittingRoom';
 import ProductReviews from './pages/ProductReviews';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminRoute from './routes/AdminRoute'; // 🔐 protection admin
+import AvatarTryOnPage from './pages/AvatarTryOnPage';
+import ClothTryOn from './pages/ClothTryOn';
+
+
 const App = () => {
   const { cart } = useCart();
 
@@ -40,7 +48,10 @@ const App = () => {
           <Route path="/hommes" element={<MenCategory />} />
           <Route path="/femmes" element={<WomenCategory />} />
           <Route path="/enfants" element={<KidsCategory />} />
-          
+          <Route path="/nouveautés" element={<NewProducts />} />
+
+          <Route path="/admin" element={ <AdminRoute> <AdminDashboard /> </AdminRoute>} />
+
           {/* Autres pages */}
           <Route path="/cart" element={<CartPage />} />
           <Route path="/notre-histoire" element={<NotreHistoire />} />
@@ -55,6 +66,11 @@ const App = () => {
           <Route path="/fitting-room" element={<FittingRoom />} />
           <Route path="/snap-fitting-room" element={<SnapFittingRoom />} />
           <Route path="/product-reviews/:productId" element={<ProductReviews />} /> 
+          <Route path="/create-avatar" element={<AvatarTryOnPage />} />
+        
+
+<Route path="/cloth-try-on" element={<ClothTryOn />} />
+
         </Routes>
       </div>
       <Footer />

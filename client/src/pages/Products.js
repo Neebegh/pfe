@@ -1,133 +1,161 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FiSearch } from 'react-icons/fi';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
-import './AllProducts.css';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import ReportPopup from '../components/ui/ReportPopup';
+import './CategoryPage.css';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [wishlist, setWishlist] = useState(() => JSON.parse(localStorage.getItem('wishlist')) || []);
+  const [cart, setCart] = useState(() => JSON.parse(localStorage.getItem('cart')) || []);
+  const [popupProductId, setPopupProductId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [cart, setCart] = useState(() => {
-    const savedCart = localStorage.getItem('cart');
-    return savedCart ? JSON.parse(savedCart) : [];
-  });
-  const [sortOption, setSortOption] = useState('default');
-  const navigate = useNavigate(); // 👉 Pour naviguer vers fitting-room
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [showLoginMessage, setShowLoginMessage] = useState(false);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('http://localhost:5000/api/products');
-        if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
-        const data = await response.json();
-        setProducts(data.products);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
+    fetch('http://localhost:5000/api/products')
+      .then(res => res.json())
+      .then(data => setProducts(data.products || []))
+      .catch(err => console.error("Erreur de chargement :", err));
   }, []);
 
-  const filteredAndSortedProducts = useMemo(() => {
-    let result = [...products];
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(p =>
-        p.name.toLowerCase().includes(term) ||
-        (p.description && p.description.toLowerCase().includes(term))
-      );
-    }
-    switch (sortOption) {
-      case 'price-asc': return result.sort((a, b) => a.price - b.price);
-      case 'price-desc': return result.sort((a, b) => b.price - a.price);
-      case 'name-asc': return result.sort((a, b) => a.name.localeCompare(b.name));
-      case 'name-desc': return result.sort((a, b) => b.name.localeCompare(a.name));
-      default: return result;
-    }
-  }, [products, searchTerm, sortOption]);
+  const allFiltered = useMemo(() => {
+    return products.filter(p =>
+      p.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [products, searchTerm]);
 
-  const handleAddToCart = (product) => {
-    const fittingDone = JSON.parse(localStorage.getItem('fittingDone')) || {};
-
-    if (!fittingDone[product.id]) {
+  const addToCart = (product) => {
+    const fitting = JSON.parse(localStorage.getItem('fittingDone')) || {};
+    if (!fitting[product.id]) {
       alert('⚠️ Faites un essayage avant d\'ajouter ce produit au panier.');
       return;
     }
 
-    const existing = cart.find(item => item.id === product.id);
-    const updatedCart = existing
+    const exists = cart.find(item => item.id === product.id);
+    const updated = exists
       ? cart.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item)
       : [...cart, { ...product, quantity: 1 }];
 
-    setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-    alert(`${product.name} ajouté au panier !`);
+    setCart(updated);
+    localStorage.setItem('cart', JSON.stringify(updated));
+    alert('✅ Produit ajouté au panier');
   };
 
-  if (loading) return <LoadingSpinner />;
-  if (error) return <p>Erreur : {error}</p>;
+  const toggleWishlist = (product) => {
+    const updated = wishlist.some(p => p.id === product.id)
+      ? wishlist.filter(p => p.id !== product.id)
+      : [...wishlist, product];
+
+    setWishlist(updated);
+    localStorage.setItem('wishlist', JSON.stringify(updated));
+    window.dispatchEvent(new Event("storage"));
+  };
+
+  const isInWishlist = (id) => wishlist.some(p => p.id === id);
 
   return (
-    <div className="products-container">
-      <header className="header">
-        <h1>Nos Produits</h1>
-      </header>
+    <div className="category-modern-container">
+      <h1 className="page-title">Tous nos produits</h1>
 
-      <div className="search-container">
-        <FiSearch />
+      <div className="search-modern">
         <input
           type="text"
+          placeholder="🔍 Rechercher un produit"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Rechercher un produit..."
         />
       </div>
 
-      <div className="filter-container">
-        <select onChange={(e) => setSortOption(e.target.value)} value={sortOption}>
-          <option value="default">Trier par défaut</option>
-          <option value="price-asc">Prix croissant</option>
-          <option value="price-desc">Prix décroissant</option>
-          <option value="name-asc">Nom A-Z</option>
-          <option value="name-desc">Nom Z-A</option>
-        </select>
-      </div>
+      {showLoginMessage && (
+        <div className="login-toast">
+          🚫 Veuillez vous <Link to="/login" className="login-link">vous connecter</Link> pour signaler un problème.
+        </div>
+      )}
 
-      <div className="products-grid">
-        {filteredAndSortedProducts.map((product) => (
-          <article className="product-card" key={product.id}>
-            <div className="product-image">
-              <img src={product.image_url || '/placeholder.jpg'} alt={product.name} />
-            </div>
-
-            <h3>{product.name}</h3>
-            <p>{product.description}</p>
-            <span>{product.price} DT</span>
-
-            <div className="product-actions">
-              {/* 👉 Ajouter au panier */}
-              <button onClick={() => handleAddToCart(product)} className="btn-hover-cart">
+      <div className="product-modern-grid">
+        {allFiltered.map(product => (
+          <div className="product-modern-card" key={product.id}>
+            <div className="image-wrapper">
+              <img
+                src={product.image_url.startsWith('http') ? product.image_url : `http://localhost:5000${product.image_url}`}
+                alt={product.name}
+              />
+              <button
+                className={`heart-wishlist ${isInWishlist(product.id) ? 'active' : ''}`}
+                onClick={() => toggleWishlist(product)}
+              >
+                {isInWishlist(product.id) ? '❤️' : '🤍'}
+              </button>
+              <button className="btn-hover-cart" onClick={() => addToCart(product)}>
                 🛒 Ajouter au panier
               </button>
+            </div>
 
-              {/* 🎯 Faire un essayage */}
+            <div className="info-zone">
+              <p className="product-name">{product.name}</p>
+              <p className="product-price">{product.price} DT</p>
+
               <button
-                onClick={() => navigate('/fitting-room', { state: { product } })}
                 className="btn-fitting-room"
-                style={{ marginTop: '10px' }}
+                onClick={() =>
+                  navigate('/fitting-room', {
+                    state: { productId: product.id, productImage: product.image_url, productName: product.name }
+                  })
+                }
               >
-                🎯 Faire un Essayage
+                🎯 Essayage
+              </button>
+
+              <button className="view-reviews-btn" onClick={() => navigate(`/product-reviews/${product.id}`)}>
+                Voir les avis
+              </button>
+
+              <button
+                onClick={() => {
+                  if (!user) {
+                    setShowLoginMessage(true);
+                    setTimeout(() => setShowLoginMessage(false), 3000);
+                  } else {
+                    setPopupProductId(product.id);
+                  }
+                }}
+                className="report-btn"
+              >
+                🚩 Signaler un problème
               </button>
             </div>
-          </article>
+
+            {user ? (
+              <p className="review-login-message">
+                <Link to={`/product-reviews/${product.id}`}>Laisser un avis</Link>
+              </p>
+            ) : (
+              <p className="review-login-message">
+                <Link to="/login">Connectez-vous</Link> pour laisser un avis.
+              </p>
+            )}
+          </div>
         ))}
       </div>
+
+      {popupProductId && (() => {
+        const product = products.find(p => p.id === popupProductId);
+        if (!product || !user) {
+          console.warn("⛔ Problème : produit ou utilisateur manquant");
+          return null;
+        }
+        return (
+          <ReportPopup
+            isOpen={true}
+            onClose={() => setPopupProductId(null)}
+            product={product}
+            user={user}
+          />
+        );
+      })()}
     </div>
   );
 };
